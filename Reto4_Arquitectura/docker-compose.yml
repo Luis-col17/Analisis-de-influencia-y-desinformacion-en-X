@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j-reto4
+    ports:
+      - "7474:7474" # Puerto para el navegador web
+      - "7687:7687" # Puerto para conexiones de drivers (Python, etc.)
+    environment:
+      - NEO4J_AUTH=neo4j/password123
+      - NEO4J_PLUGINS=["graph-data-science", "apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=gds.*,apoc.*
+      # Opcional: Descomenta las siguientes líneas si quieres instalar el plugin GDS (Graph Data Science) para el PageRank y Louvain
+      # - NEO4J_PLUGINS=["graph-data-science"]
+      # - NEO4J_dbms_security_procedures_unrestricted=gds.*
+    volumes:
+      # Mapea la carpeta local 'datos' a la carpeta 'import' de Neo4j
+      - ./datos:/var/lib/neo4j/import
+      # Guarda los datos de Neo4j para que no se borren si apagas el contenedor
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
