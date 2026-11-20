@@ -220,5 +220,5 @@ LIMIT $limit;
 
 ## Integrantes
 
-- [Tu Nombre]
-- [Nombre de tu amigo]
+David Santiago Agudelo Gonzalez 
+Luis Manuel Osorio Saenz
