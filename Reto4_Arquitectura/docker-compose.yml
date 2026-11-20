@@ -9,6 +9,7 @@ services:
       - "7687:7687" # Puerto para conexiones de drivers (Python, etc.)
     environment:
       - NEO4J_AUTH=neo4j/password123
+      # CORS HTTP ya viene con Access-Control-Allow-Origin: * por defecto.
       - NEO4J_PLUGINS=["graph-data-science", "apoc"]
       - NEO4J_dbms_security_procedures_unrestricted=gds.*,apoc.*
       # Opcional: Descomenta las siguientes líneas si quieres instalar el plugin GDS (Graph Data Science) para el PageRank y Louvain
