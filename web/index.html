@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reto 4 | Evolución S3 + Grafo Neo4j</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <p class="eyebrow">Reto 4, Arquitecturas de datos masivos</p>
+    <h1>Análisis de influencia y desinformación en X</h1>
+    <p class="subtitle">Dos fuentes independientes: evolución temporal desde S3/Athena y grafo desde Neo4j.</p>
+  </header>
+
+  <main class="layout">
+    <section class="panel" aria-labelledby="titulo-evolucion">
+      <header class="panel__head">
+        <p class="panel__tag">S3 y Athena</p>
+        <h2 id="titulo-evolucion">Evolución temporal</h2>
+        <p class="panel__desc">Serie mensual de tuits, usuarios y retuits consultada desde S3. Filtra por años con el deslizador.</p>
+        <span id="estado-evolucion" class="estado estado--info">Cargando…</span>
+      </header>
+
+      <div class="kpis">
+        <article class="kpi"><span>Total tuits</span><strong id="kpi-tuits">—</strong></article>
+        <article class="kpi"><span>Mes pico</span><strong id="kpi-pico">—</strong></article>
+        <article class="kpi"><span>Retuits</span><strong id="kpi-retuits">—</strong></article>
+        <article class="kpi"><span>% retuits global</span><strong id="kpi-pct">—</strong></article>
+      </div>
+
+      <div class="filtro-anios">
+        <div class="filtro-anios__head">
+          <label>Filtrar años</label>
+          <output id="rango-anios" for="anio-desde anio-hasta">—</output>
+          <button id="btn-anios-todos" type="button">Ver todos</button>
+        </div>
+        <div class="rango-doble">
+          <div class="rango-doble__track"></div>
+          <div id="rango-doble-fill" class="rango-doble__fill"></div>
+          <input id="anio-desde" type="range" min="2008" max="2020" value="2008" step="1" aria-label="Año desde">
+          <input id="anio-hasta" type="range" min="2008" max="2020" value="2020" step="1" aria-label="Año hasta">
+        </div>
+        <div class="rango-doble__escala"><span id="anio-min">—</span><span id="anio-max">—</span></div>
+      </div>
+
+      <div class="chart-box"><canvas id="chart-evolucion" aria-label="Gráfico de evolución temporal"></canvas></div>
+
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Mes</th><th class="num">Tuits</th><th class="num">Usuarios</th><th class="num">Retuits</th><th class="num">% retuits</th></tr></thead>
+          <tbody id="tabla-evolucion"><tr><td colspan="5">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="panel__actions">
+        <button id="btn-recargar-evolucion" type="button">Recargar desde S3</button>
+        <p id="nota-evolucion" class="nota"></p>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="titulo-grafo">
+      <header class="panel__head">
+        <p class="panel__tag">Neo4j</p>
+        <h2 id="titulo-grafo">Grafo de influencia</h2>
+        <p class="panel__desc">Relaciones <code>Usuario — HABLA_DE — Tema</code> consultadas desde Neo4j.</p>
+        <span id="estado-grafo" class="estado estado--info">Cargando…</span>
+      </header>
+
+      <div class="controles">
+        <label>
+          Consulta Cypher
+          <select id="consulta-grafo">
+            <option value="relaciones">Relaciones usuario → tema</option>
+            <option value="top_usuarios">Usuarios con más temas</option>
+            <option value="top_temas">Temas más usados</option>
+            <option value="comunidades">Louvain · comunidades por tema</option>
+            <option value="resumen">Resumen del grafo</option>
+          </select>
+        </label>
+        <label>
+          Límite
+          <input id="limite-grafo" type="number" min="1" max="1000" value="100">
+        </label>
+        <button id="btn-consultar-grafo" type="button">Consultar Neo4j</button>
+      </div>
+
+      <div class="kpis">
+        <article class="kpi"><span>Usuarios</span><strong id="kpi-usuarios">—</strong></article>
+        <article class="kpi"><span>Temas</span><strong id="kpi-temas">—</strong></article>
+        <article class="kpi"><span>Relaciones</span><strong id="kpi-relaciones">—</strong></article>
+        <article class="kpi"><span>Consulta</span><strong id="kpi-consulta">—</strong></article>
+      </div>
+
+      <div id="grafo-red" class="grafo-box" hidden></div>
+      <div id="chart-grafo-box" class="chart-box" hidden><canvas id="chart-grafo" aria-label="Gráfico de resultados del grafo"></canvas></div>
+
+      <div class="table-box">
+        <table>
+          <thead id="cabecera-grafo"></thead>
+          <tbody id="tabla-grafo"><tr><td>Cargando…</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="panel__actions">
+        <p id="nota-grafo" class="nota"></p>
+      </div>
+    </section>
+  </main>
+
+  <section class="panel" aria-labelledby="titulo-rendimiento">
+    <header class="panel__head">
+      <p class="panel__tag">Rendimiento</p>
+      <h2 id="titulo-rendimiento">Tiempos de carga</h2>
+      <p class="panel__desc">Medidas recientes.</p>
+    </header>
+
+    <div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;">
+      <article class="kpi"><span>S3 fetch</span><strong id="kpi-s3-tiempo">—</strong></article>
+      <article class="kpi"><span>Neo4j query</span><strong id="kpi-neo4j-tiempo">—</strong></article>
+      <article class="kpi"><span>resultAvailable</span><strong id="kpi-available">—</strong></article>
+      <article class="kpi"><span>resultConsumed</span><strong id="kpi-consumed">—</strong></article>
+    </div>
+
+    <div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;">
+      <article class="kpi"><span>Última actual.</span><strong id="kpi-actualizado">—</strong></article>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Cada panel consulta su API por separado. Si una falla, la otra igual se muestra.</p>
+    <p>Las credenciales de Neo4j en <code>config.js</code> son solo para demo local (<code>webreader</code>).</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+  <script src="theme.js"></script>
+  <script src="config.js"></script>
+  <script src="evolucion.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

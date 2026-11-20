@@ -1,0 +1,14 @@
+# Ignorar archivos pesados y de datos
+*.csv
+*.parquet
+*.zip
+*.rar
+
+# Ignorar carpetas de imágenes o arquitectura (si pesan mucho)
+Arquitectura/
+
+# Ignorar archivos de entorno y sistema
+.env
+.DS_Store
+Thumbs.db
+
