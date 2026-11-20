@@ -463,8 +463,8 @@
       nota("nota-grafo", "Revisá que el contenedor esté corriendo, el CORS habilitado y el usuario webreader creado.");
       const tbody = $("tabla-grafo");
       if (tbody) tbody.innerHTML = "<tr><td colspan='6'>No se pudo consultar Neo4j.</td></tr>";
-      setKpi("kpi-neo4j-tiempo", "—");
-      setKpi("kpi-actualizado", "—");
+      setKpi("kpi-neo4j-tiempo", "-");
+      setKpi("kpi-actualizado", "-");
     }
   }
 
@@ -589,11 +589,11 @@
     if (redGrafo) redGrafo.destroy();
 
     redGrafo = new window.vis.Network(contenedor, { nodes: nodos, edges: aristas }, {
-      nodes: { shape: "dot", font: { size: 11, color: "#e5e7eb" }, borderWidth: 1 },
+      nodes: { shape: "dot", font: { size: 11, color: "#1a202c" }, borderWidth: 1 },
       edges: { arrows: "to", smooth: true, color: { color: "rgba(148,163,184,.45)", highlight: "#38bdf8" } },
       groups: {
-        usuario: { color: { background: "#38bdf8", border: "#0284c7" } },
-        tema: { shape: "box", color: { background: "#a78bfa", border: "#7c3aed" } }
+        usuario: { color: { background: "#38bdf8", border: "#1a202c" } },
+        tema: { shape: "box", color: { background: "#a78bfa", border: "#1a202c" } }
       },
       physics: { stabilization: true, barnesHut: { gravitationalConstant: -2500, springLength: 120 } },
       interaction: { hover: true, tooltipDelay: 120 }
